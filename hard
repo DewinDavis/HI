@@ -1,0 +1,46 @@
+"""
+Moving data from Complete CSV into Sqlite db.
+"""
+
+import csv
+import sqlite3
+
+DB_FILE = 'College_Basketball.db'
+conn = sqlite3.connect(DB_FILE)
+
+def create_college_basketball_table():
+    cur = conn.cursor()
+    str_sql = """
+        create table if not exists stats (
+            id intger primary key autoincrement,
+            TEAM text, 
+            CONF text,
+            SEED integer,
+         );
+        """
+
+    cur.execute(str_sql)
+    conn.commit()
+
+def open_cvs_insert_into_db():
+    row_count = 0
+
+    with open('complete.csv', 'r') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for bball_row_dic in reader:
+            row_count += 1
+            if row_count <=10 or row_count % 10000 ==0:
+                print('{0:>5}) team: {1:<20} conference: {2:<15} seed: {3}'.format(
+                    row_count, bball_row_dic['TEAM'], bball_row_dic['CONF'],
+                    bball_row_dic['SEED']))
+                print(bball_row_dic['TEAM'])
+
+
+def main():
+    create_college_basketball_table()
+    open_cvs_insert_into_db() 
+    conn.close()
+
+
+if __name__ == "__main__":
+    main()
